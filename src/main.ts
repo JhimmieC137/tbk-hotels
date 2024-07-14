@@ -3,21 +3,20 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { AuthModule } from './modules/auth/auth.module';
-import { UserModule } from './modules/users/user.module';
+import { HotelsModule } from './modules/hotels/hotels.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const apiDocsConfig = new DocumentBuilder()
-  .setTitle('Travel Booking Platform - Auth and User Management')
-  .setDescription('All endpoints for the platforms auth operations and user managemeent')
+  .setTitle('Travel Booking Platform - Hotel reservations')
+  .setDescription('All endpoints for the hotel reservation operations')
   .setVersion('1.0')
-  .addTag('Auth')
+  .addTag('Hotel')
   .build();
 
   const apiDocs = SwaggerModule.createDocument(app, apiDocsConfig, {
-    include: [AuthModule, UserModule],
+    include: [HotelsModule],
   });
 
   SwaggerModule.setup('docs', app, apiDocs);

@@ -1,4 +1,4 @@
-import { User } from "src/modules/users/entities/user.entity";
+import { Hotel } from "src/modules/hotels/entities/hotel.entity";
 
 export class CustomInfoResDto {
   status: number = 200;
@@ -25,7 +25,7 @@ export class CustomListResDto {
   total_count: number = null;
   page: number = null;
   next_page: number = null;
-  results: User[] = [];
+  results: Hotel[] = [];
 }
 
 export class CustomResDto {

@@ -1,21 +1,12 @@
-import { AuthModule } from 'src/modules/auth/auth.module';
-import { UserModule } from 'src/modules/users/user.module';
-// import { NinjasModule } from 'src/modules/ninjas/ninjas.module';
-// import { PhonesModule } from 'src/modules/phones/phones.module';
-
+import { HotelsModule } from 'src/modules/hotels/hotels.module';
 export const baseRoute = 'api/v1';
 
-const authRoute = {
+const hotelsRoute = {
   path: baseRoute,
-  module: AuthModule,
+  module: HotelsModule,
 };
 
-const userRoute = {
-  path: baseRoute,
-  module: UserModule,
-};
 
 export const appRoutes = [
-  authRoute, 
-  userRoute,
+  hotelsRoute,
 ];
