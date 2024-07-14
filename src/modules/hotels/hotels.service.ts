@@ -1,26 +1,138 @@
 import { Injectable } from '@nestjs/common';
 import { CreateHotelDto } from './dto/create-hotel.dto';
 import { UpdateHotelDto } from './dto/update-hotel.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Hotel } from './entities/hotel.entity';
+import { Repository } from 'typeorm';
+import { BAD_REQUEST_400, NOT_FOUND_404 } from 'src/helpers/exceptions/auth';
+import { HotelsQueryResponseDto } from './dto/responses.dto';
 
 @Injectable()
 export class HotelsService {
-  create(createHotelDto: CreateHotelDto) {
-    return 'This action adds a new hotel';
+  constructor(
+    @InjectRepository(Hotel)
+    private hotelRepository: Repository<Hotel>,
+
+  ){}
+
+  async create(createHotelDto: CreateHotelDto) {
+    try{
+      const newHotel = new Hotel();
+      newHotel.name = createHotelDto.name;
+      newHotel.address = createHotelDto.address;
+
+      const newHotelObj = await this.hotelRepository.save(newHotel);
+
+      return newHotelObj;
+
+    } catch (error) {
+      throw error
+    }
   }
 
-  findAll() {
-    return `This action returns all hotels`;
+  async findAll(page: number, limit: number, search: string): Promise<HotelsQueryResponseDto> {
+    if (!page) page = 1;
+    if (!limit) limit = 10;
+    const offset = (page - 1) * limit
+    try {
+      
+      const [hotels, totalCount] = await this.hotelRepository.findAndCount({
+        where: {
+          is_active: true,
+        },
+        skip: offset,
+        take: limit
+      })
+
+      return {
+        hotels,
+        page,
+        totalCount
+      }
+
+    } catch (error) {
+      throw error
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} hotel`;
+  async findOne(id: string) {
+
+    try {
+      
+      const hotel = await this.hotelRepository.findOne({
+        where: {
+          id,
+        }
+      })
+
+      if (!hotel) {
+        throw new NOT_FOUND_404("Hotel not found");
+      } else if (hotel && !hotel.is_active) {
+        throw new BAD_REQUEST_400("Hotel has been deactivated");
+      }
+
+      return hotel;
+
+    } catch (error) {
+      throw error
+    }
+
   }
 
-  update(id: number, updateHotelDto: UpdateHotelDto) {
-    return `This action updates a #${id} hotel`;
+  async update(id: string, updateHotelDto: UpdateHotelDto) {
+    try {
+
+      const hotel = await this.hotelRepository.findOne({
+        where: {
+          id,
+        }
+      })
+
+
+      if (!hotel) {
+        throw new NOT_FOUND_404("Hotel not found");
+      } else if (hotel && !hotel.is_active) {
+        throw new BAD_REQUEST_400("Hotel has been deactivated");
+      }
+
+      
+      await this.hotelRepository.update( id, {
+        ...updateHotelDto
+      })
+
+      const updatedHotel = await this.hotelRepository.findOne({
+        where: {id}
+      })
+
+      return updatedHotel;
+
+    } catch (error) {
+      throw error
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} hotel`;
+  async remove(id: string) {
+    try {
+      
+      const hotel = await this.hotelRepository.findOne({
+        where: {
+          id
+        }
+      })
+  
+  
+      if (!hotel) {
+        throw new NOT_FOUND_404("Hotel not found");
+      } else if (hotel && !hotel.is_active) {
+        throw new BAD_REQUEST_400("Hotel has been deactivated already");
+      }
+  
+      hotel.is_active = false;
+  
+      await this.hotelRepository.save(hotel);
+      
+    } catch (error) {
+      throw error
+    }
   }
 }

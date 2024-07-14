@@ -6,27 +6,16 @@ import {
     UpdateDateColumn,
     DeleteDateColumn,
 } from 'typeorm'; 
-
-@Entity('hotels')
-export class Hotel {
+  
+@Entity('token_blacklist')
+export class TokenBlacklist {
     @PrimaryGeneratedColumn('uuid')
     id: string;
-
+   
     @Column({
         nullable: false
     })
-    name: String;
-
-    @Column({
-        nullable: true,
-    })
-    address: String;
-
-    @Column({
-        nullable: false,
-        default: true,
-    })
-    is_active: boolean;
+    token: String;
 
     @CreateDateColumn({
     nullable: true

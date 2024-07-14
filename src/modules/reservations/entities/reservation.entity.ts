@@ -6,27 +6,21 @@ import {
     UpdateDateColumn,
     DeleteDateColumn,
 } from 'typeorm'; 
-
-@Entity('hotels')
-export class Hotel {
+  
+@Entity('reservations')
+export class Reservation {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column({
         nullable: false
     })
-    name: String;
+    hotel_id: String;
 
     @Column({
         nullable: true,
     })
-    address: String;
-
-    @Column({
-        nullable: false,
-        default: true,
-    })
-    is_active: boolean;
+    user_id: String;
 
     @CreateDateColumn({
     nullable: true

@@ -9,6 +9,7 @@ import { dbConfig } from './settings/db.config';
 import { RouterModule } from '@nestjs/core';
 import { appRoutes } from './helpers/router';
 import { HotelsModule } from './modules/hotels/hotels.module';
+import { ReservationsModule } from './modules/reservations/reservations.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { HotelsModule } from './modules/hotels/hotels.module';
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
     HotelsModule,
+    ReservationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
