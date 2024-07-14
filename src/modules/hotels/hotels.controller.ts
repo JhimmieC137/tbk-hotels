@@ -48,9 +48,9 @@ export class HotelsController {
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<CustomResDto> {
-    const hotels =  await this.hotelsService.findOne(id);
+    const hotel =  await this.hotelsService.findOne(id);
     const response = this.customResDto;
-    response.results = hotels;
+    response.results = hotel;
     response.message = 'Hotel retrieved successfully'
     return response;
   }
