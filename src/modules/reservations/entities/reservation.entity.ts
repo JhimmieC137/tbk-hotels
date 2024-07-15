@@ -13,11 +13,6 @@ export class Reservation {
     id: string;
 
     @Column({
-        nullable: false
-    })
-    hotel_id: String;
-
-    @Column({
         nullable: true,
     })
     user_id: String;

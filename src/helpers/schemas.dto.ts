@@ -1,4 +1,5 @@
 import { Hotel } from "src/modules/hotels/entities/hotel.entity";
+import { Reservation } from "src/modules/reservations/entities/reservation.entity";
 
 export class CustomInfoResDto {
   status: number = 200;
@@ -25,7 +26,7 @@ export class CustomListResDto {
   total_count: number = null;
   page: number = null;
   next_page: number = null;
-  results: Hotel[] = [];
+  results: Hotel[] | Reservation[]  = [];
 }
 
 export class CustomResDto {

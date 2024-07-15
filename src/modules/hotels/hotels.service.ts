@@ -6,16 +6,19 @@ import { Hotel } from './entities/hotel.entity';
 import { Repository } from 'typeorm';
 import { BAD_REQUEST_400, NOT_FOUND_404 } from 'src/helpers/exceptions/auth';
 import { HotelsQueryResponseDto } from './dto/responses.dto';
+import { TokenBlacklist } from './entities/blacklist.entity';
 
 @Injectable()
 export class HotelsService {
   constructor(
     @InjectRepository(Hotel)
     private hotelRepository: Repository<Hotel>,
+    @InjectRepository(TokenBlacklist)
+    private blacklistRepository: Repository<TokenBlacklist>,
 
   ){}
 
-  async create(createHotelDto: CreateHotelDto) {
+  async create(createHotelDto: CreateHotelDto): Promise<Hotel> {
     try{
       const newHotel = new Hotel();
       newHotel.name = createHotelDto.name;
@@ -131,6 +134,21 @@ export class HotelsService {
   
       await this.hotelRepository.save(hotel);
       
+    } catch (error) {
+      throw error
+    }
+  }
+
+
+  async blacklistToken(token: string) {
+    try {
+
+      const blackToken = new TokenBlacklist();
+      blackToken.token = token;
+  
+      await this.blacklistRepository.save(blackToken);
+      
+      return "Token blacklisted successfully"
     } catch (error) {
       throw error
     }

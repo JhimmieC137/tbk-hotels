@@ -1,26 +1,138 @@
 import { Injectable } from '@nestjs/common';
-import { CreateReservationDto } from './dto/create-reservation.dto';
-import { UpdateReservationDto } from './dto/update-reservation.dto';
+import { Reservation } from './entities/reservation.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CreateReservationDto, ReservationQueryDto, UpdateReservationDto } from './dto/resquests.dto';
+import { ReservationQueryResponseDto } from './dto/responses.dto';
+import { NOT_FOUND_404 } from 'src/helpers/exceptions/auth';
+import { TokenBlacklist } from '../hotels/entities/blacklist.entity';
 
 @Injectable()
 export class ReservationsService {
-  create(createReservationDto: CreateReservationDto) {
-    return 'This action adds a new reservation';
+  constructor(
+    @InjectRepository(Reservation)
+    private reservationRepository: Repository<Reservation>,
+    @InjectRepository(TokenBlacklist)
+    private blacklistRepository: Repository<TokenBlacklist>,
+  ){}
+
+  async create(createReservationDto: CreateReservationDto): Promise<Reservation> {
+    try{
+      const newReservation = new Reservation();
+      newReservation.user_id = createReservationDto.user_id;
+
+      const newRservationObj = await this.reservationRepository.save(newReservation);
+
+      return newRservationObj;
+
+    } catch (error) {
+      throw error
+    }
   }
 
-  findAll() {
-    return `This action returns all reservations`;
+  async findAll( page: number, limit: number, search: string ): Promise<ReservationQueryResponseDto> {
+    if (!page) page = 1;
+    if (!limit) limit = 10;
+    const offset = (page - 1) * limit
+    try{
+      const [reservations, totalCount] = await this.reservationRepository.findAndCount({
+        skip: offset,
+        take: limit
+      }) 
+
+      return {
+        reservations,
+        totalCount,
+        page,
+      }
+    } catch (error) {
+      throw error
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} reservation`;
+  async findOne(id: string) {
+    try{
+      const reservationObj = await this.reservationRepository.findOne({
+        where: {id}
+      })
+
+      if (!reservationObj) {
+        throw new NOT_FOUND_404("Reservation not found");
+      }
+      // else if (reservationObj && !reservationObj.profile.is_active) {
+      //   throw new BAD_REQUEST_400("reservation has been deactivated");
+      // }
+
+
+      return reservationObj
+
+    } catch (error) {
+      throw error 
+    }
   }
 
-  update(id: number, updateReservationDto: UpdateReservationDto) {
-    return `This action updates a #${id} reservation`;
+  async update(id: string, updateReservationDto: UpdateReservationDto) {
+    try {
+      
+      const reservationObj = await this.reservationRepository.findOne({
+        where: {id}
+      })
+
+      if (!reservationObj) {
+        throw new NOT_FOUND_404("Reservation not found");
+      }
+      // else if (reservationObj && !reservationObj.profile.is_active) {
+      //   throw new BAD_REQUEST_400("reservation has been deactivated");
+      // }
+
+      await this.reservationRepository.update( id, {
+        ...updateReservationDto
+      });
+      
+
+      const updatedReservationObj = await this.reservationRepository.findOne({
+        where: {id}
+      });
+
+      return updatedReservationObj;
+
+    } catch (error) {
+      throw error
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} reservation`;
+  async remove(id: string) {
+    try {
+      
+      const reservationObj = await this.reservationRepository.findOne({
+        where: {id}
+      })
+
+      if (!reservationObj) {
+        throw new NOT_FOUND_404("Reservation not found");
+      }
+      // else if (reservationObj && !reservationObj.profile.is_active) {
+      //   throw new BAD_REQUEST_400("reservation has been deactivated");
+      // }
+
+      await this.reservationRepository.remove(reservationObj);
+
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async blacklistToken(token: string) {
+    try {
+
+      const blackToken = new TokenBlacklist();
+      blackToken.token = token;
+  
+      await this.blacklistRepository.save(blackToken);
+      
+      return "Token blacklisted successfully"
+    } catch (error) {
+      throw error
+    }
   }
 }

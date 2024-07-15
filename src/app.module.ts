@@ -13,7 +13,6 @@ import { ReservationsModule } from './modules/reservations/reservations.module';
 
 @Module({
   imports: [
-    HotelsModule,
     RouterModule.register([
       ...appRoutes
     ]),
