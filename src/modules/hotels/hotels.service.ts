@@ -26,6 +26,8 @@ export class HotelsService {
 
       const newHotelObj = await this.hotelRepository.save(newHotel);
 
+      // Notify
+
       return newHotelObj;
 
     } catch (error) {

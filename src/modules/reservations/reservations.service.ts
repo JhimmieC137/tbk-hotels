@@ -23,6 +23,8 @@ export class ReservationsService {
 
       const newRservationObj = await this.reservationRepository.save(newReservation);
 
+      // Notify
+
       return newRservationObj;
 
     } catch (error) {
@@ -93,6 +95,8 @@ export class ReservationsService {
       const updatedReservationObj = await this.reservationRepository.findOne({
         where: {id}
       });
+
+      // Notify
 
       return updatedReservationObj;
 
