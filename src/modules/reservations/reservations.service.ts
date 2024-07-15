@@ -139,4 +139,21 @@ export class ReservationsService {
       throw error
     }
   }
+
+  async checkBlacklist(token: string): Promise<Boolean> {
+    try{
+      const blackToken = await this.blacklistRepository.findOne({
+        where: {token}
+      });
+      
+      if (!blackToken) {
+        return false;
+      };
+
+      return true;
+    } catch (error) {
+      throw error;
+    }
+
+  };
 }
