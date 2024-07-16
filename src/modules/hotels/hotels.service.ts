@@ -145,10 +145,18 @@ export class HotelsService {
   async blacklistToken(token: string) {
     try {
 
-      const blackToken = new TokenBlacklist();
-      blackToken.token = token;
+      const blackToken = await this.blacklistRepository.findOne({
+        where: {token}
+      });
+    
+      if (!blackToken) {
+        return "Token blacklisted already";
+      };
+
+      const newBlackToken = new TokenBlacklist();
+      newBlackToken.token = token;
   
-      await this.blacklistRepository.save(blackToken);
+      await this.blacklistRepository.save(newBlackToken);
       
       return "Token blacklisted successfully"
     } catch (error) {
