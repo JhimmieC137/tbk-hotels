@@ -1,3 +1,4 @@
+import { Hotel } from 'src/modules/hotels/entities/hotel.entity';
 import {
     Entity,
     Column,
@@ -5,6 +6,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     DeleteDateColumn,
+    ManyToOne,
 } from 'typeorm'; 
   
 @Entity('reservations')
@@ -16,6 +18,9 @@ export class Reservation {
         nullable: true,
     })
     user_id: String;
+
+    @ManyToOne(() => Hotel, (hotel) => hotel.reservations)
+    hotel: Hotel
 
     @CreateDateColumn({
     nullable: true

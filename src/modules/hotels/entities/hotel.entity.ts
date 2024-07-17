@@ -1,3 +1,4 @@
+import { Reservation } from 'src/modules/reservations/entities/reservation.entity';
 import {
     Entity,
     Column,
@@ -5,6 +6,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     DeleteDateColumn,
+    OneToMany,
 } from 'typeorm'; 
 
 @Entity('hotels')
@@ -21,6 +23,9 @@ export class Hotel {
         nullable: true,
     })
     address: String;
+
+    @OneToMany(() => Reservation, (reservation) => reservation.hotel) // note: we will create author property in the Photo class below
+    reservations: Reservation[]
 
     @Column({
         nullable: false,

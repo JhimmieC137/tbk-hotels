@@ -23,6 +23,7 @@ export class ReservationsService {
     try{
       const newReservation = new Reservation();
       newReservation.user_id = user_id;
+      newReservation.hotel = createReservationDto.hotel;
 
       const newRservationObj = await this.reservationRepository.save(newReservation);
 

@@ -1,12 +1,18 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional } from 'class-validator';
+import { Hotel } from 'src/modules/hotels/entities/hotel.entity';
 
 export class CreateReservationDto {
     @ApiProperty({
         required: true,
     })
     user_id: String;
+    
+    @ApiProperty({
+        required: true,
+    })
+    hotel: Hotel;
 }
 
 export class UpdateReservationDto extends PartialType(CreateReservationDto) {}
