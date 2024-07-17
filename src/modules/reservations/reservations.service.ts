@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Reservation } from './entities/reservation.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { CreateReservationDto, ReservationQueryDto, UpdateReservationDto } from 
 import { ReservationQueryResponseDto } from './dto/responses.dto';
 import { NOT_FOUND_404 } from 'src/helpers/exceptions/auth';
 import { TokenBlacklist } from '../hotels/entities/blacklist.entity';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class ReservationsService {
@@ -14,16 +15,25 @@ export class ReservationsService {
     private reservationRepository: Repository<Reservation>,
     @InjectRepository(TokenBlacklist)
     private blacklistRepository: Repository<TokenBlacklist>,
+    @Inject('NOTIFICATION_SERVICE')
+    private rabbitClientNotification: ClientProxy,
   ){}
 
-  async create(createReservationDto: CreateReservationDto): Promise<Reservation> {
+  async create(user_id: string, createReservationDto: CreateReservationDto): Promise<Reservation> {
     try{
       const newReservation = new Reservation();
-      newReservation.user_id = createReservationDto.user_id;
+      newReservation.user_id = user_id;
 
       const newRservationObj = await this.reservationRepository.save(newReservation);
 
       // Notify
+      this.rabbitClientNotification.emit(
+        'create-notification',
+        JSON.stringify({
+          user_id: user_id,
+          message: "Your hotel reservation has been created. Find more information in your email"
+        })
+      )
 
       return newRservationObj;
 
@@ -32,12 +42,13 @@ export class ReservationsService {
     }
   }
 
-  async findAll( page: number, limit: number, search: string ): Promise<ReservationQueryResponseDto> {
+  async findAll( user_id: string, page: number, limit: number, search: string ): Promise<ReservationQueryResponseDto> {
     if (!page) page = 1;
     if (!limit) limit = 10;
     const offset = (page - 1) * limit
     try{
       const [reservations, totalCount] = await this.reservationRepository.findAndCount({
+        where: {user_id},
         skip: offset,
         take: limit
       }) 
@@ -52,10 +63,10 @@ export class ReservationsService {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(user_id: string, id: string) {
     try{
       const reservationObj = await this.reservationRepository.findOne({
-        where: {id}
+        where: {id, user_id}
       })
 
       if (!reservationObj) {
@@ -73,11 +84,11 @@ export class ReservationsService {
     }
   }
 
-  async update(id: string, updateReservationDto: UpdateReservationDto) {
+  async update(id: string, user_id: string,  updateReservationDto: UpdateReservationDto) {
     try {
       
       const reservationObj = await this.reservationRepository.findOne({
-        where: {id}
+        where: {id, user_id}
       })
 
       if (!reservationObj) {
@@ -86,6 +97,16 @@ export class ReservationsService {
       // else if (reservationObj && !reservationObj.profile.is_active) {
       //   throw new BAD_REQUEST_400("reservation has been deactivated");
       // }
+
+
+      // Notify
+      this.rabbitClientNotification.emit(
+        'create-notification',
+        JSON.stringify({
+          user_id: user_id,
+          message: "You made updates to your reservation. Find more information in your email"
+        })
+      )
 
       await this.reservationRepository.update( id, {
         ...updateReservationDto
@@ -105,11 +126,11 @@ export class ReservationsService {
     }
   }
 
-  async remove(id: string) {
+  async remove(user_id: string, id: string) {
     try {
       
       const reservationObj = await this.reservationRepository.findOne({
-        where: {id}
+        where: {id, user_id}
       })
 
       if (!reservationObj) {
@@ -120,6 +141,14 @@ export class ReservationsService {
       // }
 
       await this.reservationRepository.remove(reservationObj);
+
+      this.rabbitClientNotification.emit(
+        'create_notifiation',
+        JSON.stringify({
+          user_id,
+          message: "You made updates to your reservation. Find more information in your email"
+        })
+      )
 
     } catch (error) {
       throw error

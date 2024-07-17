@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateHotelDto } from './dto/create-hotel.dto';
-import { UpdateHotelDto } from './dto/update-hotel.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Hotel } from './entities/hotel.entity';
 import { Repository } from 'typeorm';
 import { BAD_REQUEST_400, NOT_FOUND_404 } from 'src/helpers/exceptions/auth';
 import { HotelsQueryResponseDto } from './dto/responses.dto';
 import { TokenBlacklist } from './entities/blacklist.entity';
+import { CreateHotelDto, UpdateHotelDto } from './dto/requests.dto';
 
 @Injectable()
 export class HotelsService {

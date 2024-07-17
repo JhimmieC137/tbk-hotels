@@ -1,13 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Request } from '@nestjs/common';
 import { HotelsService } from './hotels.service';
-import { CreateHotelDto } from './dto/create-hotel.dto';
-import { UpdateHotelDto } from './dto/update-hotel.dto';
 import {
   CustomInfoResDto,
   CustomListResDto,
   CustomResDto,
 } from '../../helpers/schemas.dto';
-import { HotelsQueryDto } from './dto/requests.dto';
+import { CreateHotelDto, HotelsQueryDto, UpdateHotelDto } from './dto/requests.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { JwtAuthGuard } from 'src/helpers/jwt-auth.guard';

@@ -9,7 +9,9 @@ import { CustomInfoResDto, CustomListResDto, CustomResDto } from '../../helpers/
 import { JwtStrategy } from 'src/helpers/jwt.strategy';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Hotel, Reservation, TokenBlacklist])],
+  imports: [
+    TypeOrmModule.forFeature([Hotel, Reservation, TokenBlacklist])
+  ],
   controllers: [HotelsController],
   providers: [HotelsService, JwtStrategy, CustomInfoResDto, CustomListResDto, CustomResDto],
 })

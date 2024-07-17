@@ -2,6 +2,7 @@ import { ParseIntPipe } from '@nestjs/common';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsString, IsEmail, IsNumber, IsOptional, IsBoolean } from 'class-validator';
+import { PartialType } from '@nestjs/swagger';
 
 export class paginationDto {
     @ApiPropertyOptional({
@@ -27,3 +28,18 @@ export class HotelsQueryDto extends paginationDto {
     })
     search: string = null;
 }
+export class CreateHotelDto {
+    @ApiProperty({
+        nullable: false
+    })
+    name: String;
+
+    @ApiProperty({
+        nullable: true,
+        required: false
+    })
+    address: String;
+}
+
+
+export class UpdateHotelDto extends PartialType(CreateHotelDto) {}

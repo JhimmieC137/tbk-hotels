@@ -47,7 +47,7 @@ export class ReservationsController {
   async create(@Request() req: reqType.Request, @Body() createReservationDto: CreateReservationDto): Promise<CustomResDto> {
     await this.checkBlacklist(req);
     const response = this.customResDto;
-    response.results = await this.reservationsService.create(createReservationDto);
+    response.results = await this.reservationsService.create(req.user['id'], createReservationDto);
     response.message = "Reservation created successfully"
 
     return response;
@@ -61,7 +61,7 @@ export class ReservationsController {
     const page = Number(reservationQueryDto?.page) ?? 1;
     const limit = Number(reservationQueryDto?.limit) ?? 10;
 
-    const reservations =  await this.reservationsService.findAll(page, limit, reservationQueryDto.search);
+    const reservations =  await this.reservationsService.findAll(req.user['id'], page, limit, reservationQueryDto.search);
     
     const response = this.customListResDto;
     response.results = reservations.reservations;
@@ -79,7 +79,7 @@ export class ReservationsController {
   @Get(':id')
   async findOne(@Request() req: reqType.Request, @Param('id') id: string): Promise<CustomResDto> {
     await this.checkBlacklist(req);
-    const reservations =  await this.reservationsService.findOne(id);
+    const reservations =  await this.reservationsService.findOne(req.user['id'], id);
     
     const response = this.customResDto;
     response.results = reservations;
@@ -92,7 +92,7 @@ export class ReservationsController {
   @Patch(':id')
   async update(@Request() req: reqType.Request, @Param('id') id: string, @Body() updateReservationDto: UpdateReservationDto) {
     await this.checkBlacklist(req);
-    const reservation =  await this.reservationsService.update(id, updateReservationDto);
+    const reservation =  await this.reservationsService.update(id, req.user['id'], updateReservationDto);
     
     const response = this.customResDto;
     response.results = reservation;
@@ -105,7 +105,7 @@ export class ReservationsController {
   @Delete(':id')
   async remove(@Request() req: reqType.Request, @Param('id') id: string): Promise<CustomInfoResDto> {
     await this.checkBlacklist(req);
-    await this.reservationsService.remove(id);
+    await this.reservationsService.remove(req.user['id'], id);
     const response = this.customInfoResDto;
     response.info = 'Deleted successfully';
     return response;
