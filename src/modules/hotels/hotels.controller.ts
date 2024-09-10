@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Request, Head } from '@nestjs/common';
 import { HotelsService } from './hotels.service';
 import {
   CustomInfoResDto,
@@ -32,6 +32,12 @@ export class HotelsController {
     }
  
   }
+
+  @Head("health")
+  async getHealth(): Promise<Boolean>{
+    return true;
+  }
+
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
